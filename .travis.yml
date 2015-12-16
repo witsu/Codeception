@@ -10,11 +10,11 @@ php:
 matrix:
   allow_failures:
     - php: hhvm
-
-env:
-  matrix:
-    - SYMFONY="min"
-    - SYMFONY="3.0.0"
+  include:
+    - php: 5.6
+      env: SYMFONY=3.0.0
+    - php: 7.0
+      env: SYMFONY=3.0.0
 
 branches:
   except:
@@ -41,13 +41,13 @@ install:
   - composer self-update && composer --version
   - composer global require "fxp/composer-asset-plugin:~1.1.1"
   - 'if [ "$TRAVIS_PHP_VERSION" = "5.4" ]; then composer require guzzlehttp/guzzle=~5.0; fi' # install old guzzle
-  - 'if [ "$SYMFONY" != "min" ]; then composer require symfony/finder=~$SYMFONY; fi'
-  - 'if [ "$SYMFONY" != "min" ]; then composer require symfony/console=~$SYMFONY; fi'
-  - 'if [ "$SYMFONY" != "min" ]; then composer require symfony/event-dispatcher=~$SYMFONY; fi'
-  - 'if [ "$SYMFONY" != "min" ]; then composer require symfony/yaml=~$SYMFONY; fi'
-  - 'if [ "$SYMFONY" != "min" ]; then composer require symfony/browser-kit=~$SYMFONY; fi'
-  - 'if [ "$SYMFONY" != "min" ]; then composer require symfony/css-selector=~$SYMFONY; fi'
-  - 'if [ "$SYMFONY" != "min" ]; then composer require symfony/dom-crawler=~$SYMFONY; fi'
+  - 'if [ -z "$SYMFONY"]; then composer require symfony/finder=~$SYMFONY; fi'
+  - 'if [ -z "$SYMFONY"]; then composer require symfony/console=~$SYMFONY; fi'
+  - 'if [ -z "$SYMFONY"]; then composer require symfony/event-dispatcher=~$SYMFONY; fi'
+  - 'if [ -z "$SYMFONY"]; then composer require symfony/yaml=~$SYMFONY; fi'
+  - 'if [ -z "$SYMFONY"]; then composer require symfony/browser-kit=~$SYMFONY; fi'
+  - 'if [ -z "$SYMFONY"]; then composer require symfony/css-selector=~$SYMFONY; fi'
+  - 'if [ -z "$SYMFONY"]; then composer require symfony/dom-crawler=~$SYMFONY; fi'
   - composer install --prefer-source
   # Yii2
   - composer create-project yiisoft/yii2-app-basic frameworks-yii-basic
@@ -110,13 +110,13 @@ before_script:
   - '[[ "$TRAVIS_PHP_VERSION" == "5.4" ]] || touch frameworks-l5/storage/testing.sqlite'
   - '[[ "$TRAVIS_PHP_VERSION" == "5.4" ]] || php frameworks-l5/artisan migrate --database=sqlite_testing --force'
   # Symfony
-  - '[["$SYMFONY" != "min"]] || php frameworks-symfony/app/console doctrine:schema:create -n --env test'
-  - '[["$SYMFONY" != "min"]] || php frameworks-symfony/app/console doctrine:fixtures:load -n --env test'
+  - '[[-z "$SYMFONY"]] || php frameworks-symfony/app/console doctrine:schema:create -n --env test'
+  - '[[-z "$SYMFONY"]] || php frameworks-symfony/app/console doctrine:fixtures:load -n --env test'
   # Build
   - php codecept build -c frameworks-yii-basic/tests
   - '[[ "$TRAVIS_PHP_VERSION" == "hhvm" ]] || [[ "$TRAVIS_PHP_VERSION" == "7" ]] || php codecept build -c frameworks-phalcon'
   - php codecept build -c frameworks-laravel
-  - '[["$SYMFONY" != "min"]] || php codecept build -c frameworks-symfony/src/AppBundle'
+  - '[[-z "$SYMFONY"]] || php codecept build -c frameworks-symfony/src/AppBundle'
   - '[[ "$TRAVIS_PHP_VERSION" == "5.4" ]] || php codecept build -c frameworks-l5'
   - php codecept build -c frameworks-zf1
   - php codecept build -c frameworks-zf2
@@ -129,7 +129,7 @@ script:
   - php codecept run -c frameworks-laravel functional,api,unit # Laravel4 Tests
   - '[[ "$TRAVIS_PHP_VERSION" == "5.4" ]] || php codecept run -c frameworks-l5' # Laravel5 Tests
   - '[[ "$TRAVIS_PHP_VERSION" == "hhvm" ]] || [[ "$TRAVIS_PHP_VERSION" == "7" ]] || php codecept run functional -c frameworks-phalcon' # Phalcon Tests
-  - '[["$SYMFONY" != "min"]] || php codecept run functional -c frameworks-symfony/src/AppBundle '# Symfony Tests
+  - '[[ -z "$SYMFONY" ]] || php codecept run functional -c frameworks-symfony/src/AppBundle '# Symfony Tests
   - php codecept run functional -c frameworks-zf1 # ZF1 Tests
   - php codecept run functional -c frameworks-zf2 # ZF2 Tests
   - '[[ "$TRAVIS_PHP_VERSION" == "5.4" ]] || php codecept run functional -c frameworks-zend-expressive' # Zend Expressive Tests
