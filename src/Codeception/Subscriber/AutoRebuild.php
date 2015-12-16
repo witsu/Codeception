@@ -4,6 +4,7 @@ namespace Codeception\Subscriber;
 use Codeception\Configuration;
 use Codeception\Event\SuiteEvent;
 use Codeception\Events;
+use Codeception\Lib\Generator\Actor;
 use Codeception\Lib\Generator\Actions;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -20,6 +21,13 @@ class AutoRebuild implements EventSubscriberInterface
         $settings = $e->getSettings();
         $modules = $e->getSuite()->getModules();
 
+        $actorFile = Configuration::supportDir() . $settings['class_name'];
+        if (!file_exists($actorFile)) {
+            codecept_debug("Generating {$settings['class_name']}...");
+            $actor = new Actor($settings);
+            @file_put_contents($actorFile, $actor->produce());
+        }
+
         $actorActionsFile = Configuration::supportDir() . '_generated' . DIRECTORY_SEPARATOR
             . $settings['class_name'] . 'Actions.php';
 
@@ -28,7 +36,7 @@ class AutoRebuild implements EventSubscriberInterface
             $this->generateActorActions($actorActionsFile, $settings);
             return;
         }
-        
+
         // load actor class to see hash
         $handle = @fopen($actorActionsFile, "r");
         if ($handle and is_writable($actorActionsFile)) {
