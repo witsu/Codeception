@@ -21,7 +21,7 @@ class AutoRebuild implements EventSubscriberInterface
         $settings = $e->getSettings();
         $modules = $e->getSuite()->getModules();
 
-        $actorFile = Configuration::supportDir() . $settings['class_name'];
+        $actorFile = Configuration::supportDir() . $settings['class_name'] . '.php';
         if (!file_exists($actorFile)) {
             codecept_debug("Generating {$settings['class_name']}...");
             $actor = new Actor($settings);

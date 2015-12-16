@@ -1,7 +1,8 @@
 <?php 
 $I = new CliGuy($scenario);
-$I->wantTo('change configs and check that Guy is rebuilt');
+$I->wantTo('change configs and check that Actor is rebuilt');
 $I->amInPath('tests/data/sandbox');
+$I->deleteFile('tests/_support/CodeGuy.php');
 $I->writeToFile('tests/unit.suite.yml', <<<EOF
 class_name: CodeGuy
 modules:
@@ -13,3 +14,5 @@ $I->seeInShellOutput('Cli');
 $I->seeFileFound('tests/_support/_generated/CodeGuyActions.php');
 $I->seeInThisFile('public function seeInShellOutput');
 $I->seeInThisFile('public function runShellCommand');
+$I->seeFileFound('tests/_support/CodeGuy.php');
+$I->seeInThisFile('class CodeGuy extends \Codeception\Actor');

@@ -13,6 +13,7 @@
 * [REST] JsonType to support collections: all items in an array will be validates against JsonType. By @davertmik
 * [PhpBrowser] Set curl options for Guzzle6 correctly. See #2533. By @Naktibalda
 * Framework modules now throw an `ExternalUrlException` when a test tries to open a URL that is not handled by the framework, i.e. an external URL. See #2396
+* Automatically create actor class on run if it doesn't exist yet (with autorebuild).
 
 #### 2.1.4
 
