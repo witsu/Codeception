@@ -306,10 +306,10 @@ class WebDriver extends CodeceptionModule implements
     {
         if (!isset($this->webDriver)) {
             $this->_initialize();
-        }
-        if (!isset($this->webDriver)) {
-            $test->getMetadata()->setSkip('WebDriver failed to initialise, please make sure that Selenium Server or PhantomJS is running');
-            return;
+
+            if (!isset($this->webDriver)) {
+                $test->getMetadata()->setFail('WebDriver failed to initialise, please make sure that Selenium Server or PhantomJS is running');
+            }
         }
         $test->getMetadata()->setCurrent([
             'browser' => $this->config['browser'],
@@ -372,6 +372,10 @@ class WebDriver extends CodeceptionModule implements
      */
     public function debugWebDriverLogs()
     {
+        if (!isset($this->webDriver)) {
+            $this->debug('WebDriver::debugWebDriverLogs method has been called when webDriver is not set');
+            return;
+        }
         try {
             // Dump out latest Selenium logs
             $logs = $this->webDriver->manage()->getAvailableLogTypes();
@@ -497,7 +501,7 @@ class WebDriver extends CodeceptionModule implements
 
     public function _saveScreenshot($filename)
     {
-        if ($this->webDriver === null) {
+        if (!isset($this->webDriver)) {
             $this->debug('WebDriver::_saveScreenshot method has been called when webDriver is not set');
             return;
         }
@@ -519,6 +523,10 @@ class WebDriver extends CodeceptionModule implements
      */
     public function _savePageSource($filename)
     {
+        if (!isset($this->webDriver)) {
+            $this->debug('WebDriver::_savePageSource method has been called when webDriver is not set');
+            return;
+        }
         try {
             file_put_contents($filename, $this->webDriver->getPageSource());
         } catch (\Exception $e) {
